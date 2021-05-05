@@ -1,0 +1,36 @@
+version: "2"
+
+services:
+  sonarqube:
+    image: sonarqube:8.8.0-community
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - sonarnet
+    ports:
+      - 9000:9000
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - /opt/sonarqube/data:/opt/sonarqube/data
+      - /opt/sonarqube/extensions:/opt/sonarqube/extensions
+      - /opt/sonarqube/logs:/opt/sonarqube/logs
+      - /opt/sonarqube/temp:/opt/sonarqube/temp
+  db:
+    image: postgres
+    restart: always
+    networks:
+      - sonarnet
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      - /opt/sonarqube/postgresql:/var/lib/postgresql
+      - /opt/sonarqube/postgresql/data:/var/lib/postgresql/data
+
+networks:
+  sonarnet:
+    driver: bridge
